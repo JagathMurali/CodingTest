@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model Coding.ViewModels.OwnerViewModel;
+
+<div class="container">
+    <div class="row">
+
+        @if (Model != null)
+        {
+            if (Model.MaleOwnerCatList != null)
+            { 
+                <div class="col-sm-12">
+                    Male
+                    <ul>
+                        @foreach (var pet in Model.MaleOwnerCatList)
+                        {
+
+
+
+                                    <li>@pet.Name</li>
+
+
+
+                        }
+                    </ul>
+                </div>
+            }
+            if (Model.FemaleOwnerCatList != null)
+            {
+                <div class="col-sm-12">
+                    Female
+                    <ul>
+                        @foreach (var pet in Model.FemaleOwnerCatList)
+                        {
+
+
+
+                                    <li>@pet.Name</li>
+
+
+
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+    </div>
+</div>
