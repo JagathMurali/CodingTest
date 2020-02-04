@@ -33,6 +33,7 @@ namespace Coding
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            services.AddSingleton<IConfiguration>(Configuration);
 
             services.AddScoped<IPetsService, PetsService>();
             services.AddScoped<IPetHelper, PetHelper>();

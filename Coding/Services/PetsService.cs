@@ -1,5 +1,6 @@
 ﻿using Coding.Models;
 using Coding.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -11,35 +12,45 @@ namespace Coding
 {
     public class PetsService : IPetsService
     {
-        private string serviceUrl = "http://agl-developer-test.azurewebsites.net/people.json";
-        private readonly HttpClient _client;
+        private string serviceUrl;
+        private readonly IHttpClientFactory _httpClientFactory;
         private ILogger _logger;
-        public PetsService(HttpClient client, ILogger<PetsService> logger)
+        private IConfiguration _config;
+        public PetsService(IHttpClientFactory clientFactor, ILogger<PetsService> logger, IConfiguration config)
         {
-            _client = client;
+            _httpClientFactory = clientFactor;
             _logger = logger;
+            _config = config;
         }
+
         public async Task<List<OwnerModel>> GetOwnerPetsDetails()
         {
+            serviceUrl = _config["ApiUrl"];
             List<OwnerModel> ownerList = new List<OwnerModel>();
-            try
-            {               
-                var request = new HttpRequestMessage(HttpMethod.Get, serviceUrl);
-                var response = await _client.SendAsync(request);
-                if (response.IsSuccessStatusCode)
-                {
-                    ownerList = await response.Content.ReadAsAsync<List<OwnerModel>>();
-                }
-                else
-                {
-                    _logger.LogError("Error GetOwnerPetsDetails :-  Api does return correct result");
-                }
-            }
-            catch(Exception ex)
+            var client = _httpClientFactory.CreateClient();
+            if (!string.IsNullOrEmpty(serviceUrl))
             {
-                _logger.LogError("Error in GetOwnerPetsDetails " + ex.Message);
-                throw ex;
+                try
+                {
+                    
+                    var request = new HttpRequestMessage(HttpMethod.Get, serviceUrl);
+                    var response = await client.SendAsync(request);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        ownerList = await response.Content.ReadAsAsync<List<OwnerModel>>();
+                    }
+                    else
+                    {
+                        _logger.LogError("Error GetOwnerPetsDetails :-  Api does return correct result");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Error in GetOwnerPetsDetails " + ex.Message);
+                    throw ex;
+                }
             }
+            
             return ownerList;
         }
     }
